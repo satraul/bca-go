@@ -1,0 +1,17 @@
+.gitignore
+.travis.yml
+README.md
+api\openapi.yaml
+api_bca.go
+client.go
+configuration.go
+docs\BCAApi.md
+docs\InlineObject.md
+docs\InlineObject1.md
+git_push.sh
+go.mod
+go.sum
+model_inline_object.go
+model_inline_object_1.go
+response.go
+utils.go
