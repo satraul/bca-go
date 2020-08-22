@@ -14,4 +14,3 @@ go.sum
 model_inline_object.go
 model_inline_object_1.go
 response.go
-utils.go
