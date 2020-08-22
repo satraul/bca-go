@@ -38,6 +38,7 @@ import (
 var (
 	jsonCheck = regexp.MustCompile(`(?i:(?:application|text)/(?:vnd\.[^;]+\+)?json)`)
 	xmlCheck  = regexp.MustCompile(`(?i:(?:application|text)/xml)`)
+	htmlCheck = regexp.MustCompile(`(?i:(?:application|text)/html)`)
 )
 
 // APIClient manages communication with the BCA API v1.0
@@ -157,13 +158,12 @@ func parameterToJson(obj interface{}) (string, error) {
 	return string(jsonBuf), err
 }
 
-
 // callAPI do the request.
 func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 	if c.cfg.Debug {
-	        dump, err := httputil.DumpRequestOut(request, true)
+		dump, err := httputil.DumpRequestOut(request, true)
 		if err != nil {
-		        return nil, err
+			return nil, err
 		}
 		log.Printf("\n%s\n", string(dump))
 	}
@@ -205,7 +205,8 @@ func (c *APIClient) prepareRequest(
 	formParams url.Values,
 	formFileName string,
 	fileName string,
-	fileBytes []byte) (localVarRequest *http.Request, err error) {
+	fileBytes []byte,
+	cookies []*http.Cookie) (localVarRequest *http.Request, err error) {
 
 	var body *bytes.Buffer
 
@@ -352,6 +353,11 @@ func (c *APIClient) prepareRequest(
 
 	}
 
+	// add cookies, if any
+	for _, cookie := range cookies {
+		localVarRequest.AddCookie(cookie)
+	}
+
 	for header, value := range c.cfg.DefaultHeader {
 		localVarRequest.Header.Add(header, value)
 	}
@@ -384,6 +390,12 @@ func (c *APIClient) decode(v interface{}, b []byte, contentType string) (err err
 	}
 	if jsonCheck.MatchString(contentType) {
 		if err = json.Unmarshal(b, v); err != nil {
+			return err
+		}
+		return nil
+	}
+	if htmlCheck.MatchString(contentType) {
+		if err = extractHTML(b, v); err != nil {
 			return err
 		}
 		return nil
