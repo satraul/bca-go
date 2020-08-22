@@ -46,7 +46,7 @@ AccountStatementView AccountStatementView
  * @param value28endYr29
 @return map[string]interface{}
 */
-func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate time.Time, endDate time.Time, cookies []*http.Cookie) ([]Entry, *_nethttp.Response, error) {
+func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate time.Time, endDate time.Time, cookies []*http.Cookie) ([]Entry, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -59,10 +59,10 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate tim
 
 	// validate dates
 	if startDate.After(endDate) {
-		return localVarReturnValue, nil, errors.New("date invalid: start date must be before end date")
+		return localVarReturnValue, errors.New("date invalid: start date must be before end date")
 	}
 	if endDate.AddDate(0, 0, -7).Before(startDate) {
-		return localVarReturnValue, nil, errors.New("date invalid: range must be less than 7 days")
+		return localVarReturnValue, errors.New("date invalid: range must be less than 7 days")
 	}
 
 	// create path and map variables
@@ -101,18 +101,18 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate tim
 	localVarFormParams.Add("value(endYr)", parameterToString(endDate.Year(), ""))
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return localVarReturnValue, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -120,7 +120,7 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate tim
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
 	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -129,10 +129,10 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate tim
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarReturnValue, nil
 }
 
 /*
@@ -145,7 +145,7 @@ BalanceInquiry BalanceInquiry
  * @param contentLength
 @return map[string]interface{}
 */
-func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Cookie) (Balance, *_nethttp.Response, error) {
+func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Cookie) (Balance, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -183,18 +183,18 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Coo
 	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=menu", "")
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return localVarReturnValue, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -202,7 +202,7 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Coo
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
 	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
@@ -211,10 +211,10 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Coo
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarReturnValue, nil
 }
 
 /*
@@ -223,16 +223,15 @@ Login Login
  * @param userID
  * @param password
  * @param userIP - Client's public IP
-@return string
+@return []*http.Cookie
 */
-func (a *BCAApiService) Login(ctx _context.Context, userID string, password string, userIP string) (string, *_nethttp.Response, error) {
+func (a *BCAApiService) Login(ctx _context.Context, userID string, password string, userIP string) ([]*http.Cookie, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  string
 		localVarCookies      []*http.Cookie
 	)
 
@@ -271,18 +270,18 @@ func (a *BCAApiService) Login(ctx _context.Context, userID string, password stri
 	localVarFormParams.Add("mobile", parameterToString(true, ""))
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse.Cookies(), err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse.Cookies(), err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -290,19 +289,10 @@ func (a *BCAApiService) Login(ctx _context.Context, userID string, password stri
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarHTTPResponse.Cookies(), newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarHTTPResponse.Cookies(), nil
 }
 
 /*
@@ -314,14 +304,13 @@ Logout Logout
  * @param cookie
 @return map[string]interface{}
 */
-func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) (string, *_nethttp.Response, error) {
+func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) error {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  string
 		localVarCookies      []*http.Cookie
 	)
 
@@ -353,18 +342,18 @@ func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) (st
 	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=acctstmtview", "")
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -372,17 +361,8 @@ func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) (st
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return nil
 }

@@ -58,7 +58,7 @@ type service struct {
 
 // NewAPIClient creates a new API client. Requires a userAgent string describing your application.
 // optionally a custom http.Client to allow for advanced features such as caching.
-func NewAPIClient(cfg *Configuration) *APIClient {
+func NewAPIClient(cfg *Configuration) *BCAApiService {
 	if cfg.HTTPClient == nil {
 		cfg.HTTPClient = http.DefaultClient
 	}
@@ -70,7 +70,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	// API Services
 	c.BCAApi = (*BCAApiService)(&c.common)
 
-	return c
+	return c.BCAApi
 }
 
 func atoi(in string) (int, error) {

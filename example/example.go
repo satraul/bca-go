@@ -12,35 +12,39 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	bcaclient := bca.NewAPIClient(bca.NewConfiguration())
+	retcode := 1
+	defer func() { os.Exit(retcode) }()
+
 	var (
+		ctx      = context.Background()
 		username = os.Getenv("BCA_USERNAME")
 		password = os.Getenv("BCA_PASSWORD")
 		ip       = getPublicIP()
 	)
 
-	_, r, err := bcaclient.BCAApi.Login(ctx, username, password, ip)
+	api := bca.NewAPIClient(bca.NewConfiguration())
+	auth, err := api.Login(ctx, username, password, ip)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
-	auth := r.Cookies()
+	defer api.Logout(ctx, auth)
 
-	balance, _, err := bcaclient.BCAApi.BalanceInquiry(ctx, auth)
+	balance, err := api.BalanceInquiry(ctx, auth)
 	if err != nil {
-		bcaclient.BCAApi.Logout(ctx, auth)
 		log.Fatal(err)
+		return
 	}
 	log.Printf("%+v\n", balance)
 
-	statement, _, err := bcaclient.BCAApi.AccountStatementView(ctx, time.Now().AddDate(0, 0, -7), time.Now(), auth)
+	statement, err := api.AccountStatementView(ctx, time.Now().AddDate(0, 0, -7), time.Now(), auth)
 	if err != nil {
-		bcaclient.BCAApi.Logout(ctx, auth)
 		log.Fatal(err)
+		return
 	}
 	log.Printf("%+v\n", statement)
 
-	bcaclient.BCAApi.Logout(ctx, auth)
+	retcode = 0
 }
 
 // https://gist.github.com/ankanch/8c8ec5aaf374039504946e7e2b2cdf7f
