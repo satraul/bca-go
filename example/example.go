@@ -25,14 +25,14 @@ func main() {
 	api := bca.NewAPIClient(bca.NewConfiguration())
 	auth, err := api.Login(ctx, username, password, ip)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	defer api.Logout(ctx, auth)
 
 	balance, err := api.BalanceInquiry(ctx, auth)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	log.Printf("%+v\n", balance)
