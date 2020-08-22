@@ -8,7 +8,6 @@ Method | HTTP request | Description
 [**BalanceInquiry**](BCAApi.md#BalanceInquiry) | **Post** /balanceinquiry.do | BalanceInquiry
 [**Login**](BCAApi.md#Login) | **Post** /authentication.do | Login
 [**Logout**](BCAApi.md#Logout) | **Get** /authentication.do?value(actions)&#x3D;logout | Logout
-[**Menu**](BCAApi.md#Menu) | **Post** /accountstmt.do?value(actions)&#x3D;menu | Menu
 
 
 
@@ -154,43 +153,6 @@ Name | Type | Description  | Notes
 **referer** | **string**|  | 
 **valueActions** | **string**|  | 
 **cookie** | **string**|  | 
-
-### Return type
-
-**map[string]interface{}**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: text/plain
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## Menu
-
-> map[string]interface{} Menu(ctx, contentType, userAgent, referer, valueActions, cookie, contentLength)
-
-Menu
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**contentType** | **string**|  | 
-**userAgent** | **string**|  | 
-**referer** | **string**|  | 
-**valueActions** | **string**|  | 
-**cookie** | **string**|  | 
-**contentLength** | **string**|  | 
 
 ### Return type
 

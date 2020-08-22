@@ -36,13 +36,6 @@ Class | Method | HTTP request | Description
 *BCAApi* | [**BalanceInquiry**](docs/BCAApi.md#balanceinquiry) | **Post** /balanceinquiry.do | BalanceInquiry
 *BCAApi* | [**Login**](docs/BCAApi.md#login) | **Post** /authentication.do | Login
 *BCAApi* | [**Logout**](docs/BCAApi.md#logout) | **Get** /authentication.do?value(actions)&#x3D;logout | Logout
-*BCAApi* | [**Menu**](docs/BCAApi.md#menu) | **Post** /accountstmt.do?value(actions)&#x3D;menu | Menu
-
-
-## Documentation For Models
-
- - [InlineObject](docs/InlineObject.md)
- - [InlineObject1](docs/InlineObject1.md)
 
 
 ## Documentation For Authorization
