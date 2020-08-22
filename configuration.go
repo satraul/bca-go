@@ -37,7 +37,6 @@ var (
 
 	// ContextAPIKey takes an APIKey as authentication for the request
 	ContextAPIKey = contextKey("apikey")
-
 )
 
 // BasicAuth provides basic http authentication to a request passed via context using ContextBasicAuth
@@ -52,7 +51,6 @@ type APIKey struct {
 	Prefix string
 }
 
-
 // ServerVariable stores the information about a server variable
 type ServerVariable struct {
 	Description  string
@@ -62,9 +60,9 @@ type ServerVariable struct {
 
 // ServerConfiguration stores the information about a server
 type ServerConfiguration struct {
-	Url string
+	Url         string
 	Description string
-	Variables map[string]ServerVariable
+	Variables   map[string]ServerVariable
 }
 
 // Configuration stores the configuration of the API client
@@ -84,11 +82,11 @@ func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		BasePath:      "https://m.klikbca.com",
 		DefaultHeader: make(map[string]string),
-		UserAgent:     "OpenAPI-Generator/1.0.0/go",
+		UserAgent:     "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
 		Debug:         false,
-		Servers:       []ServerConfiguration{
+		Servers: []ServerConfiguration{
 			{
-				Url: "https://m.klikbca.com",
+				Url:         "https://m.klikbca.com",
 				Description: "No description provided",
 			},
 		},
@@ -104,7 +102,7 @@ func (c *Configuration) AddDefaultHeader(key string, value string) {
 // ServerUrl returns URL based on server settings
 func (c *Configuration) ServerUrl(index int, variables map[string]string) (string, error) {
 	if index < 0 || len(c.Servers) <= index {
-		return "", fmt.Errorf("Index %v out of range %v", index, len(c.Servers) - 1)
+		return "", fmt.Errorf("Index %v out of range %v", index, len(c.Servers)-1)
 	}
 	server := c.Servers[index]
 	url := server.Url
