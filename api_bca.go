@@ -11,9 +11,12 @@ package bca
 
 import (
 	_context "context"
+	"errors"
 	_ioutil "io/ioutil"
+	"net/http"
 	_nethttp "net/http"
 	_neturl "net/url"
+	"time"
 )
 
 // Linger please
@@ -43,23 +46,33 @@ AccountStatementView AccountStatementView
  * @param value28endYr29
 @return map[string]interface{}
 */
-func (a *BCAApiService) AccountStatementView(ctx _context.Context, contentType string, userAgent string, referer string, valueActions string, cookie string, contentLength string, r1 string, value28D129 string, value28startDt29 string, value28startMt29 string, value28startYr29 string, value28endDt29 string, value28endMt29 string, value28endYr29 string) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate time.Time, endDate time.Time, cookies []*http.Cookie) ([]Entry, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  []Entry
+		localVarCookies      []*http.Cookie
 	)
 
+	// validate dates
+	if startDate.After(endDate) {
+		return localVarReturnValue, nil, errors.New("date invalid: start date must be before end date")
+	}
+	if endDate.AddDate(0, 0, -7).Before(startDate) {
+		return localVarReturnValue, nil, errors.New("date invalid: range must be less than 7 days")
+	}
+
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/accountstmt.do?value(actions)=acctstmtview"
+	localVarPath := a.client.cfg.BasePath + "/accountstmt.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
+	localVarCookies = cookies
 
-	localVarQueryParams.Add("value(actions)", parameterToString(valueActions, ""))
+	localVarQueryParams.Add("value(actions)", parameterToString("acctstmtview", ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
 
@@ -70,27 +83,23 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, contentType s
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(contentLength, "")
-	localVarFormParams.Add("r1", parameterToString(r1, ""))
-	localVarFormParams.Add("value%28D1%29", parameterToString(value28D129, ""))
-	localVarFormParams.Add("value%28startDt%29", parameterToString(value28startDt29, ""))
-	localVarFormParams.Add("value%28startMt%29", parameterToString(value28startMt29, ""))
-	localVarFormParams.Add("value%28startYr%29", parameterToString(value28startYr29, ""))
-	localVarFormParams.Add("value%28endDt%29", parameterToString(value28endDt29, ""))
-	localVarFormParams.Add("value%28endMt%29", parameterToString(value28endMt29, ""))
-	localVarFormParams.Add("value%28endYr%29", parameterToString(value28endYr29, ""))
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=acct_stmt", "")
+	localVarFormParams.Add("r1", parameterToString("1", ""))
+	localVarFormParams.Add("value(D1)", parameterToString("0", ""))
+	localVarFormParams.Add("value(startDt)", parameterToString(startDate.Day(), ""))
+	localVarFormParams.Add("value(startMt)", parameterToString(int(startDate.Month()), ""))
+	localVarFormParams.Add("value(startYr)", parameterToString(startDate.Year(), ""))
+	localVarFormParams.Add("value(endDt)", parameterToString(endDate.Day(), ""))
+	localVarFormParams.Add("value(endMt)", parameterToString(int(endDate.Month()), ""))
+	localVarFormParams.Add("value(endYr)", parameterToString(endDate.Year(), ""))
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
@@ -136,14 +145,15 @@ BalanceInquiry BalanceInquiry
  * @param contentLength
 @return map[string]interface{}
 */
-func (a *BCAApiService) BalanceInquiry(ctx _context.Context, contentType string, userAgent string, referer string, cookie string, contentLength string) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Cookie) (Balance, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  Balance
+		localVarCookies      []*http.Cookie
 	)
 
 	// create path and map variables
@@ -151,6 +161,7 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, contentType string,
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
+	localVarCookies = cookies
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -162,19 +173,15 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, contentType string,
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(contentLength, "")
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=menu", "")
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
@@ -213,30 +220,20 @@ func (a *BCAApiService) BalanceInquiry(ctx _context.Context, contentType string,
 /*
 Login Login
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param contentType
- * @param userAgent
- * @param referer
- * @param cookie
- * @param contentLength
- * @param value28userId29
- * @param value28pswd29
- * @param value28Submit29
- * @param value28actions29
- * @param value28userIp29
- * @param userIp
- * @param value28mobile29
- * @param value28browserInfo29
- * @param mobile
-@return map[string]interface{}
+ * @param userID
+ * @param password
+ * @param userIP - Client's public IP
+@return string
 */
-func (a *BCAApiService) Login(ctx _context.Context, contentType string, userAgent string, referer string, cookie string, contentLength int32, value28userId29 string, value28pswd29 string, value28Submit29 string, value28actions29 string, value28userIp29 string, userIp string, value28mobile29 string, value28browserInfo29 string, mobile string) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) Login(ctx _context.Context, userID string, password string, userIP string) (string, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  string
+		localVarCookies      []*http.Cookie
 	)
 
 	// create path and map variables
@@ -245,7 +242,6 @@ func (a *BCAApiService) Login(ctx _context.Context, contentType string, userAgen
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
-	localVarQueryParams.Add("Content-Length", parameterToString(contentLength, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
 
@@ -256,27 +252,24 @@ func (a *BCAApiService) Login(ctx _context.Context, contentType string, userAgen
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(cookie, "")
-	localVarFormParams.Add("value%28user_id%29", parameterToString(value28userId29, ""))
-	localVarFormParams.Add("value%28pswd%29", parameterToString(value28pswd29, ""))
-	localVarFormParams.Add("value%28Submit%29", parameterToString(value28Submit29, ""))
-	localVarFormParams.Add("value%28actions%29", parameterToString(value28actions29, ""))
-	localVarFormParams.Add("value%28user_ip%29", parameterToString(value28userIp29, ""))
-	localVarFormParams.Add("user_ip", parameterToString(userIp, ""))
-	localVarFormParams.Add("value%28mobile%29", parameterToString(value28mobile29, ""))
-	localVarFormParams.Add("value%28browser_info%29", parameterToString(value28browserInfo29, ""))
-	localVarFormParams.Add("mobile", parameterToString(mobile, ""))
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/login.jsp", "")
+	localVarFormParams.Add("value(user_id)", parameterToString(userID, ""))
+	localVarFormParams.Add("value(pswd)", parameterToString(password, ""))
+	localVarFormParams.Add("value(Submit)", parameterToString("LOGIN", ""))
+	localVarFormParams.Add("value(actions)", parameterToString("login", ""))
+	localVarFormParams.Add("value(user_ip)", parameterToString(userIP, ""))
+	localVarFormParams.Add("user_ip", parameterToString(userIP, ""))
+	localVarFormParams.Add("value(mobile)", parameterToString(true, ""))
+	localVarFormParams.Add("value(browser_info)", parameterToString(a.client.cfg.UserAgent, ""))
+	localVarFormParams.Add("mobile", parameterToString(true, ""))
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
@@ -321,23 +314,25 @@ Logout Logout
  * @param cookie
 @return map[string]interface{}
 */
-func (a *BCAApiService) Logout(ctx _context.Context, userAgent string, referer string, valueActions string, cookie string) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) (string, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  string
+		localVarCookies      []*http.Cookie
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/authentication.do?value(actions)=logout"
+	localVarPath := a.client.cfg.BasePath + "/authentication.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
+	localVarCookies = cookies
 
-	localVarQueryParams.Add("value(actions)", parameterToString(valueActions, ""))
+	localVarQueryParams.Add("value(actions)", parameterToString("logout", ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -348,17 +343,15 @@ func (a *BCAApiService) Logout(ctx _context.Context, userAgent string, referer s
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["User-Agent"] = parameterToString(userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(cookie, "")
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=acctstmtview", "")
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
@@ -403,25 +396,27 @@ Menu Menu
  * @param valueActions
  * @param cookie
  * @param contentLength
-@return map[string]interface{}
+@return string
 */
-func (a *BCAApiService) Menu(ctx _context.Context, contentType string, userAgent string, referer string, valueActions string, cookie string, contentLength string) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) Menu(ctx _context.Context, contentType string, userAgent string, referer string, valueActions string, cookie string, contentLength string, cookies []*http.Cookie) (string, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  string
+		localVarCookies      []*http.Cookie
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/accountstmt.do?value(actions)=menu"
+	localVarPath := a.client.cfg.BasePath + "/accountstmt.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
+	localVarCookies = cookies
 
-	localVarQueryParams.Add("value(actions)", parameterToString(valueActions, ""))
+	localVarQueryParams.Add("value(actions)", parameterToString("menu", ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -432,19 +427,16 @@ func (a *BCAApiService) Menu(ctx _context.Context, contentType string, userAgent
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(contentType, "")
 	localVarHeaderParams["User-Agent"] = parameterToString(userAgent, "")
 	localVarHeaderParams["Referer"] = parameterToString(referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(contentLength, "")
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
