@@ -11,9 +11,12 @@ package bca
 
 import (
 	_context "context"
+	"errors"
 	_ioutil "io/ioutil"
+	"net/http"
 	_nethttp "net/http"
 	_neturl "net/url"
+	"time"
 )
 
 // Linger please
@@ -24,190 +27,52 @@ var (
 // BCAApiService BCAApi service
 type BCAApiService service
 
-type apiAccountStatementViewRequest struct {
-	ctx _context.Context
-	apiService *BCAApiService
-	contentType *string
-	userAgent *string
-	referer *string
-	valueActions *string
-	cookie *string
-	contentLength *string
-	r1 *string
-	value28D129 *string
-	value28startDt29 *string
-	value28startMt29 *string
-	value28startYr29 *string
-	value28endDt29 *string
-	value28endMt29 *string
-	value28endYr29 *string
-}
-
-
-func (r apiAccountStatementViewRequest) ContentType(contentType string) apiAccountStatementViewRequest {
-	r.contentType = &contentType
-	return r
-}
-
-func (r apiAccountStatementViewRequest) UserAgent(userAgent string) apiAccountStatementViewRequest {
-	r.userAgent = &userAgent
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Referer(referer string) apiAccountStatementViewRequest {
-	r.referer = &referer
-	return r
-}
-
-func (r apiAccountStatementViewRequest) ValueActions(valueActions string) apiAccountStatementViewRequest {
-	r.valueActions = &valueActions
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Cookie(cookie string) apiAccountStatementViewRequest {
-	r.cookie = &cookie
-	return r
-}
-
-func (r apiAccountStatementViewRequest) ContentLength(contentLength string) apiAccountStatementViewRequest {
-	r.contentLength = &contentLength
-	return r
-}
-
-func (r apiAccountStatementViewRequest) R1(r1 string) apiAccountStatementViewRequest {
-	r.r1 = &r1
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28D129(value28D129 string) apiAccountStatementViewRequest {
-	r.value28D129 = &value28D129
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28startDt29(value28startDt29 string) apiAccountStatementViewRequest {
-	r.value28startDt29 = &value28startDt29
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28startMt29(value28startMt29 string) apiAccountStatementViewRequest {
-	r.value28startMt29 = &value28startMt29
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28startYr29(value28startYr29 string) apiAccountStatementViewRequest {
-	r.value28startYr29 = &value28startYr29
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28endDt29(value28endDt29 string) apiAccountStatementViewRequest {
-	r.value28endDt29 = &value28endDt29
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28endMt29(value28endMt29 string) apiAccountStatementViewRequest {
-	r.value28endMt29 = &value28endMt29
-	return r
-}
-
-func (r apiAccountStatementViewRequest) Value28endYr29(value28endYr29 string) apiAccountStatementViewRequest {
-	r.value28endYr29 = &value28endYr29
-	return r
-}
-
 /*
 AccountStatementView AccountStatementView
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return apiAccountStatementViewRequest
+ * @param contentType
+ * @param userAgent
+ * @param referer
+ * @param valueActions
+ * @param cookie
+ * @param contentLength
+ * @param r1
+ * @param value28D129
+ * @param value28startDt29
+ * @param value28startMt29
+ * @param value28startYr29
+ * @param value28endDt29
+ * @param value28endMt29
+ * @param value28endYr29
+@return map[string]interface{}
 */
-func (a *BCAApiService) AccountStatementView(ctx _context.Context) apiAccountStatementViewRequest {
-	return apiAccountStatementViewRequest{
-		apiService: a,
-		ctx: ctx,
-	}
-}
-
-/*
-Execute executes the request
- @return map[string]interface{}
-*/
-func (r apiAccountStatementViewRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate time.Time, endDate time.Time, cookies []*http.Cookie) ([]Entry, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  []Entry
+		localVarCookies      []*http.Cookie
 	)
 
-	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "BCAApiService.AccountStatementView")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	// validate dates
+	if startDate.After(endDate) {
+		return localVarReturnValue, errors.New("date invalid: start date must be before end date")
+	}
+	if endDate.AddDate(0, 0, -7).Before(startDate) {
+		return localVarReturnValue, errors.New("date invalid: range must be less than 7 days")
 	}
 
-	localVarPath := localBasePath + "/accountstmt.do?value(actions)=acctstmtview"
-
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/accountstmt.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	
-	if r.contentType == nil {
-		return localVarReturnValue, nil, reportError("contentType is required and must be specified")
-	}
-	
-	if r.userAgent == nil {
-		return localVarReturnValue, nil, reportError("userAgent is required and must be specified")
-	}
-	
-	if r.referer == nil {
-		return localVarReturnValue, nil, reportError("referer is required and must be specified")
-	}
-	
-	if r.valueActions == nil {
-		return localVarReturnValue, nil, reportError("valueActions is required and must be specified")
-	}
-	
-	if r.cookie == nil {
-		return localVarReturnValue, nil, reportError("cookie is required and must be specified")
-	}
-	
-	if r.contentLength == nil {
-		return localVarReturnValue, nil, reportError("contentLength is required and must be specified")
-	}
-	
-	if r.r1 == nil {
-		return localVarReturnValue, nil, reportError("r1 is required and must be specified")
-	}
-	
-	if r.value28D129 == nil {
-		return localVarReturnValue, nil, reportError("value28D129 is required and must be specified")
-	}
-	
-	if r.value28startDt29 == nil {
-		return localVarReturnValue, nil, reportError("value28startDt29 is required and must be specified")
-	}
-	
-	if r.value28startMt29 == nil {
-		return localVarReturnValue, nil, reportError("value28startMt29 is required and must be specified")
-	}
-	
-	if r.value28startYr29 == nil {
-		return localVarReturnValue, nil, reportError("value28startYr29 is required and must be specified")
-	}
-	
-	if r.value28endDt29 == nil {
-		return localVarReturnValue, nil, reportError("value28endDt29 is required and must be specified")
-	}
-	
-	if r.value28endMt29 == nil {
-		return localVarReturnValue, nil, reportError("value28endMt29 is required and must be specified")
-	}
-	
-	if r.value28endYr29 == nil {
-		return localVarReturnValue, nil, reportError("value28endYr29 is required and must be specified")
-	}
+	localVarCookies = cookies
 
-	localVarQueryParams.Add("value(actions)", parameterToString(*r.valueActions, ""))
+	localVarQueryParams.Add("value(actions)", parameterToString("acctstmtview", ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
 
@@ -218,40 +83,36 @@ func (r apiAccountStatementViewRequest) Execute() (map[string]interface{}, *_net
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(*r.contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(*r.userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(*r.referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(*r.cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(*r.contentLength, "")
-	localVarFormParams.Add("r1", parameterToString(*r.r1, ""))
-	localVarFormParams.Add("value%28D1%29", parameterToString(*r.value28D129, ""))
-	localVarFormParams.Add("value%28startDt%29", parameterToString(*r.value28startDt29, ""))
-	localVarFormParams.Add("value%28startMt%29", parameterToString(*r.value28startMt29, ""))
-	localVarFormParams.Add("value%28startYr%29", parameterToString(*r.value28startYr29, ""))
-	localVarFormParams.Add("value%28endDt%29", parameterToString(*r.value28endDt29, ""))
-	localVarFormParams.Add("value%28endMt%29", parameterToString(*r.value28endMt29, ""))
-	localVarFormParams.Add("value%28endYr%29", parameterToString(*r.value28endYr29, ""))
-	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=acct_stmt", "")
+	localVarFormParams.Add("r1", parameterToString("1", ""))
+	localVarFormParams.Add("value(D1)", parameterToString("0", ""))
+	localVarFormParams.Add("value(startDt)", parameterToString(startDate.Day(), ""))
+	localVarFormParams.Add("value(startMt)", parameterToString(int(startDate.Month()), ""))
+	localVarFormParams.Add("value(startYr)", parameterToString(startDate.Year(), ""))
+	localVarFormParams.Add("value(endDt)", parameterToString(endDate.Day(), ""))
+	localVarFormParams.Add("value(endMt)", parameterToString(int(endDate.Month()), ""))
+	localVarFormParams.Add("value(endYr)", parameterToString(endDate.Year(), ""))
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return localVarReturnValue, err
 	}
 
-	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -259,112 +120,48 @@ func (r apiAccountStatementViewRequest) Execute() (map[string]interface{}, *_net
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-type apiBalanceInquiryRequest struct {
-	ctx _context.Context
-	apiService *BCAApiService
-	contentType *string
-	userAgent *string
-	referer *string
-	cookie *string
-	contentLength *string
-}
-
-
-func (r apiBalanceInquiryRequest) ContentType(contentType string) apiBalanceInquiryRequest {
-	r.contentType = &contentType
-	return r
-}
-
-func (r apiBalanceInquiryRequest) UserAgent(userAgent string) apiBalanceInquiryRequest {
-	r.userAgent = &userAgent
-	return r
-}
-
-func (r apiBalanceInquiryRequest) Referer(referer string) apiBalanceInquiryRequest {
-	r.referer = &referer
-	return r
-}
-
-func (r apiBalanceInquiryRequest) Cookie(cookie string) apiBalanceInquiryRequest {
-	r.cookie = &cookie
-	return r
-}
-
-func (r apiBalanceInquiryRequest) ContentLength(contentLength string) apiBalanceInquiryRequest {
-	r.contentLength = &contentLength
-	return r
+	return localVarReturnValue, nil
 }
 
 /*
 BalanceInquiry BalanceInquiry
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return apiBalanceInquiryRequest
+ * @param contentType
+ * @param userAgent
+ * @param referer
+ * @param cookie
+ * @param contentLength
+@return map[string]interface{}
 */
-func (a *BCAApiService) BalanceInquiry(ctx _context.Context) apiBalanceInquiryRequest {
-	return apiBalanceInquiryRequest{
-		apiService: a,
-		ctx: ctx,
-	}
-}
-
-/*
-Execute executes the request
- @return map[string]interface{}
-*/
-func (r apiBalanceInquiryRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) BalanceInquiry(ctx _context.Context, cookies []*http.Cookie) (Balance, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  Balance
+		localVarCookies      []*http.Cookie
 	)
 
-	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "BCAApiService.BalanceInquiry")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/balanceinquiry.do"
-
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/balanceinquiry.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	
-	if r.contentType == nil {
-		return localVarReturnValue, nil, reportError("contentType is required and must be specified")
-	}
-	
-	if r.userAgent == nil {
-		return localVarReturnValue, nil, reportError("userAgent is required and must be specified")
-	}
-	
-	if r.referer == nil {
-		return localVarReturnValue, nil, reportError("referer is required and must be specified")
-	}
-	
-	if r.cookie == nil {
-		return localVarReturnValue, nil, reportError("cookie is required and must be specified")
-	}
-	
-	if r.contentLength == nil {
-		return localVarReturnValue, nil, reportError("contentLength is required and must be specified")
-	}
+	localVarCookies = cookies
 
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -376,32 +173,28 @@ func (r apiBalanceInquiryRequest) Execute() (map[string]interface{}, *_nethttp.R
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(*r.contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(*r.userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(*r.referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(*r.cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(*r.contentLength, "")
-	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=menu", "")
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return localVarReturnValue, err
 	}
 
-	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarReturnValue, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -409,204 +202,45 @@ func (r apiBalanceInquiryRequest) Execute() (map[string]interface{}, *_nethttp.R
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: err.Error(),
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarReturnValue, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-type apiLoginRequest struct {
-	ctx _context.Context
-	apiService *BCAApiService
-	contentType *string
-	userAgent *string
-	referer *string
-	cookie *string
-	contentLength *int32
-	value28userId29 *string
-	value28pswd29 *string
-	value28Submit29 *string
-	value28actions29 *string
-	value28userIp29 *string
-	userIp *string
-	value28mobile29 *string
-	value28browserInfo29 *string
-	mobile *string
-}
-
-
-func (r apiLoginRequest) ContentType(contentType string) apiLoginRequest {
-	r.contentType = &contentType
-	return r
-}
-
-func (r apiLoginRequest) UserAgent(userAgent string) apiLoginRequest {
-	r.userAgent = &userAgent
-	return r
-}
-
-func (r apiLoginRequest) Referer(referer string) apiLoginRequest {
-	r.referer = &referer
-	return r
-}
-
-func (r apiLoginRequest) Cookie(cookie string) apiLoginRequest {
-	r.cookie = &cookie
-	return r
-}
-
-func (r apiLoginRequest) ContentLength(contentLength int32) apiLoginRequest {
-	r.contentLength = &contentLength
-	return r
-}
-
-func (r apiLoginRequest) Value28userId29(value28userId29 string) apiLoginRequest {
-	r.value28userId29 = &value28userId29
-	return r
-}
-
-func (r apiLoginRequest) Value28pswd29(value28pswd29 string) apiLoginRequest {
-	r.value28pswd29 = &value28pswd29
-	return r
-}
-
-func (r apiLoginRequest) Value28Submit29(value28Submit29 string) apiLoginRequest {
-	r.value28Submit29 = &value28Submit29
-	return r
-}
-
-func (r apiLoginRequest) Value28actions29(value28actions29 string) apiLoginRequest {
-	r.value28actions29 = &value28actions29
-	return r
-}
-
-func (r apiLoginRequest) Value28userIp29(value28userIp29 string) apiLoginRequest {
-	r.value28userIp29 = &value28userIp29
-	return r
-}
-
-func (r apiLoginRequest) UserIp(userIp string) apiLoginRequest {
-	r.userIp = &userIp
-	return r
-}
-
-func (r apiLoginRequest) Value28mobile29(value28mobile29 string) apiLoginRequest {
-	r.value28mobile29 = &value28mobile29
-	return r
-}
-
-func (r apiLoginRequest) Value28browserInfo29(value28browserInfo29 string) apiLoginRequest {
-	r.value28browserInfo29 = &value28browserInfo29
-	return r
-}
-
-func (r apiLoginRequest) Mobile(mobile string) apiLoginRequest {
-	r.mobile = &mobile
-	return r
+	return localVarReturnValue, nil
 }
 
 /*
 Login Login
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return apiLoginRequest
+ * @param userID
+ * @param password
+ * @param userIP - Client's public IP
+@return []*http.Cookie
 */
-func (a *BCAApiService) Login(ctx _context.Context) apiLoginRequest {
-	return apiLoginRequest{
-		apiService: a,
-		ctx: ctx,
-	}
-}
-
-/*
-Execute executes the request
- @return map[string]interface{}
-*/
-func (r apiLoginRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) Login(ctx _context.Context, userID string, password string, userIP string) ([]*http.Cookie, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarCookies      []*http.Cookie
 	)
 
-	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "BCAApiService.Login")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/authentication.do"
-
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/authentication.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	
-	if r.contentType == nil {
-		return localVarReturnValue, nil, reportError("contentType is required and must be specified")
-	}
-	
-	if r.userAgent == nil {
-		return localVarReturnValue, nil, reportError("userAgent is required and must be specified")
-	}
-	
-	if r.referer == nil {
-		return localVarReturnValue, nil, reportError("referer is required and must be specified")
-	}
-	
-	if r.cookie == nil {
-		return localVarReturnValue, nil, reportError("cookie is required and must be specified")
-	}
-	
-	if r.contentLength == nil {
-		return localVarReturnValue, nil, reportError("contentLength is required and must be specified")
-	}
-	
-	if r.value28userId29 == nil {
-		return localVarReturnValue, nil, reportError("value28userId29 is required and must be specified")
-	}
-	
-	if r.value28pswd29 == nil {
-		return localVarReturnValue, nil, reportError("value28pswd29 is required and must be specified")
-	}
-	
-	if r.value28Submit29 == nil {
-		return localVarReturnValue, nil, reportError("value28Submit29 is required and must be specified")
-	}
-	
-	if r.value28actions29 == nil {
-		return localVarReturnValue, nil, reportError("value28actions29 is required and must be specified")
-	}
-	
-	if r.value28userIp29 == nil {
-		return localVarReturnValue, nil, reportError("value28userIp29 is required and must be specified")
-	}
-	
-	if r.userIp == nil {
-		return localVarReturnValue, nil, reportError("userIp is required and must be specified")
-	}
-	
-	if r.value28mobile29 == nil {
-		return localVarReturnValue, nil, reportError("value28mobile29 is required and must be specified")
-	}
-	
-	if r.value28browserInfo29 == nil {
-		return localVarReturnValue, nil, reportError("value28browserInfo29 is required and must be specified")
-	}
-	
-	if r.mobile == nil {
-		return localVarReturnValue, nil, reportError("mobile is required and must be specified")
-	}
 
-	localVarQueryParams.Add("Content-Length", parameterToString(*r.contentLength, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
 
@@ -617,40 +251,37 @@ func (r apiLoginRequest) Execute() (map[string]interface{}, *_nethttp.Response, 
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["Content-Type"] = parameterToString(*r.contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(*r.userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(*r.referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(*r.cookie, "")
-	localVarFormParams.Add("value%28user_id%29", parameterToString(*r.value28userId29, ""))
-	localVarFormParams.Add("value%28pswd%29", parameterToString(*r.value28pswd29, ""))
-	localVarFormParams.Add("value%28Submit%29", parameterToString(*r.value28Submit29, ""))
-	localVarFormParams.Add("value%28actions%29", parameterToString(*r.value28actions29, ""))
-	localVarFormParams.Add("value%28user_ip%29", parameterToString(*r.value28userIp29, ""))
-	localVarFormParams.Add("user_ip", parameterToString(*r.userIp, ""))
-	localVarFormParams.Add("value%28mobile%29", parameterToString(*r.value28mobile29, ""))
-	localVarFormParams.Add("value%28browser_info%29", parameterToString(*r.value28browserInfo29, ""))
-	localVarFormParams.Add("mobile", parameterToString(*r.mobile, ""))
-	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/login.jsp", "")
+	localVarFormParams.Add("value(user_id)", parameterToString(userID, ""))
+	localVarFormParams.Add("value(pswd)", parameterToString(password, ""))
+	localVarFormParams.Add("value(Submit)", parameterToString("LOGIN", ""))
+	localVarFormParams.Add("value(actions)", parameterToString("login", ""))
+	localVarFormParams.Add("value(user_ip)", parameterToString(userIP, ""))
+	localVarFormParams.Add("user_ip", parameterToString(userIP, ""))
+	localVarFormParams.Add("value(mobile)", parameterToString(true, ""))
+	localVarFormParams.Add("value(browser_info)", parameterToString(a.client.cfg.UserAgent, ""))
+	localVarFormParams.Add("mobile", parameterToString(true, ""))
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return nil, err
 	}
 
-	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse.Cookies(), err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse.Cookies(), err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -658,104 +289,39 @@ func (r apiLoginRequest) Execute() (map[string]interface{}, *_nethttp.Response, 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarHTTPResponse.Cookies(), newErr
 	}
 
-	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-type apiLogoutRequest struct {
-	ctx _context.Context
-	apiService *BCAApiService
-	userAgent *string
-	referer *string
-	valueActions *string
-	cookie *string
-}
-
-
-func (r apiLogoutRequest) UserAgent(userAgent string) apiLogoutRequest {
-	r.userAgent = &userAgent
-	return r
-}
-
-func (r apiLogoutRequest) Referer(referer string) apiLogoutRequest {
-	r.referer = &referer
-	return r
-}
-
-func (r apiLogoutRequest) ValueActions(valueActions string) apiLogoutRequest {
-	r.valueActions = &valueActions
-	return r
-}
-
-func (r apiLogoutRequest) Cookie(cookie string) apiLogoutRequest {
-	r.cookie = &cookie
-	return r
+	return localVarHTTPResponse.Cookies(), nil
 }
 
 /*
 Logout Logout
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return apiLogoutRequest
+ * @param userAgent
+ * @param referer
+ * @param valueActions
+ * @param cookie
+@return map[string]interface{}
 */
-func (a *BCAApiService) Logout(ctx _context.Context) apiLogoutRequest {
-	return apiLogoutRequest{
-		apiService: a,
-		ctx: ctx,
-	}
-}
-
-/*
-Execute executes the request
- @return map[string]interface{}
-*/
-func (r apiLogoutRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
+func (a *BCAApiService) Logout(ctx _context.Context, cookies []*http.Cookie) error {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarCookies      []*http.Cookie
 	)
 
-	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "BCAApiService.Logout")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/authentication.do?value(actions)=logout"
-
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/authentication.do"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	
-	if r.userAgent == nil {
-		return localVarReturnValue, nil, reportError("userAgent is required and must be specified")
-	}
-	
-	if r.referer == nil {
-		return localVarReturnValue, nil, reportError("referer is required and must be specified")
-	}
-	
-	if r.valueActions == nil {
-		return localVarReturnValue, nil, reportError("valueActions is required and must be specified")
-	}
-	
-	if r.cookie == nil {
-		return localVarReturnValue, nil, reportError("cookie is required and must be specified")
-	}
+	localVarCookies = cookies
 
-	localVarQueryParams.Add("value(actions)", parameterToString(*r.valueActions, ""))
+	localVarQueryParams.Add("value(actions)", parameterToString("logout", ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -766,30 +332,28 @@ func (r apiLogoutRequest) Execute() (map[string]interface{}, *_nethttp.Response,
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
+	localVarHTTPHeaderAccepts := []string{"*/*"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["User-Agent"] = parameterToString(*r.userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(*r.referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(*r.cookie, "")
-	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	localVarHeaderParams["Referer"] = parameterToString("https://m.klikbca.com/accountstmt.do?value(actions)=acctstmtview", "")
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes, localVarCookies)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return err
 	}
 
-	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
+	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -797,178 +361,8 @@ func (r apiLogoutRequest) Execute() (map[string]interface{}, *_nethttp.Response,
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return newErr
 	}
 
-	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-type apiMenuRequest struct {
-	ctx _context.Context
-	apiService *BCAApiService
-	contentType *string
-	userAgent *string
-	referer *string
-	valueActions *string
-	cookie *string
-	contentLength *string
-}
-
-
-func (r apiMenuRequest) ContentType(contentType string) apiMenuRequest {
-	r.contentType = &contentType
-	return r
-}
-
-func (r apiMenuRequest) UserAgent(userAgent string) apiMenuRequest {
-	r.userAgent = &userAgent
-	return r
-}
-
-func (r apiMenuRequest) Referer(referer string) apiMenuRequest {
-	r.referer = &referer
-	return r
-}
-
-func (r apiMenuRequest) ValueActions(valueActions string) apiMenuRequest {
-	r.valueActions = &valueActions
-	return r
-}
-
-func (r apiMenuRequest) Cookie(cookie string) apiMenuRequest {
-	r.cookie = &cookie
-	return r
-}
-
-func (r apiMenuRequest) ContentLength(contentLength string) apiMenuRequest {
-	r.contentLength = &contentLength
-	return r
-}
-
-/*
-Menu Menu
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return apiMenuRequest
-*/
-func (a *BCAApiService) Menu(ctx _context.Context) apiMenuRequest {
-	return apiMenuRequest{
-		apiService: a,
-		ctx: ctx,
-	}
-}
-
-/*
-Execute executes the request
- @return map[string]interface{}
-*/
-func (r apiMenuRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
-	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
-	)
-
-	localBasePath, err := r.apiService.client.cfg.ServerURLWithContext(r.ctx, "BCAApiService.Menu")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/accountstmt.do?value(actions)=menu"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
-	
-	if r.contentType == nil {
-		return localVarReturnValue, nil, reportError("contentType is required and must be specified")
-	}
-	
-	if r.userAgent == nil {
-		return localVarReturnValue, nil, reportError("userAgent is required and must be specified")
-	}
-	
-	if r.referer == nil {
-		return localVarReturnValue, nil, reportError("referer is required and must be specified")
-	}
-	
-	if r.valueActions == nil {
-		return localVarReturnValue, nil, reportError("valueActions is required and must be specified")
-	}
-	
-	if r.cookie == nil {
-		return localVarReturnValue, nil, reportError("cookie is required and must be specified")
-	}
-	
-	if r.contentLength == nil {
-		return localVarReturnValue, nil, reportError("contentLength is required and must be specified")
-	}
-
-	localVarQueryParams.Add("value(actions)", parameterToString(*r.valueActions, ""))
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"text/plain"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	localVarHeaderParams["Content-Type"] = parameterToString(*r.contentType, "")
-	localVarHeaderParams["User-Agent"] = parameterToString(*r.userAgent, "")
-	localVarHeaderParams["Referer"] = parameterToString(*r.referer, "")
-	localVarHeaderParams["Cookie"] = parameterToString(*r.cookie, "")
-	localVarHeaderParams["Content-Length"] = parameterToString(*r.contentLength, "")
-	req, err := r.apiService.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := r.apiService.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = r.apiService.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return nil
 }
