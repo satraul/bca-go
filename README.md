@@ -14,6 +14,8 @@ go get github.com/satraul/bca-go
 
 ```golang
 import (
+    "log"
+
     bca "github.com/satraul/bca-go"
 )
 
@@ -51,7 +53,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Authorization
 
-[**Login**](docs/BCAApi.md#login) will return session cookies ([]*Cookie) that are used for auth in all other endpoints.
+[**Login**](docs/BCAApi.md#login) will return session cookies ([]*http.Cookie) that are used for auth in all other endpoints.
 
 ## Contributing
 
