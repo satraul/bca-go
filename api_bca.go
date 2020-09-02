@@ -61,8 +61,8 @@ func (a *BCAApiService) AccountStatementView(ctx _context.Context, startDate tim
 	if startDate.After(endDate) {
 		return localVarReturnValue, errors.New("date invalid: start date must be before end date")
 	}
-	if endDate.AddDate(0, 0, -7).Before(startDate) {
-		return localVarReturnValue, errors.New("date invalid: range must be less than 7 days")
+	if endDate.Sub(startDate) > time.Hour*24*27 {
+		return localVarReturnValue, errors.New("date invalid: range must be less than 27 days")
 	}
 
 	// create path and map variables
