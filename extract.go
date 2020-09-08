@@ -110,8 +110,9 @@ func convDec(raw string) (d decimal.Decimal) {
 }
 
 func convTime(raw string) (t time.Time) {
-	// May have timezone issues
-	t, err := time.ParseInLocation("02/01", raw, time.Local)
+	// Use +0700 WIB
+	l, _ := time.LoadLocation("Asia/Jakarta")
+	t, err := time.ParseInLocation("02/01", raw, l)
 	if err != nil {
 		return
 	}
