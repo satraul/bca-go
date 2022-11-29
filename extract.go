@@ -3,7 +3,7 @@ package bca
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"regexp"
 	"time"
@@ -47,7 +47,7 @@ func extractHTML(b []byte, v interface{}) (err error) {
 
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
-		return
+		return err
 	}
 
 	if blncCheck.Match(b) {
@@ -58,7 +58,7 @@ func extractHTML(b []byte, v interface{}) (err error) {
 		return store(extractStatement(doc), v)
 	}
 
-	return errors.New("failed to extract HTML")
+	return fmt.Errorf("failed to extract HTML: %s %s", string(b[:]), b[:])
 }
 
 func extractBalanceInquiry(doc *goquery.Document) *Balance {
